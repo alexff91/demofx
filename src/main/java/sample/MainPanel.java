@@ -17,6 +17,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.effect.Reflection;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -55,8 +56,6 @@ public class MainPanel extends Application {
 
 	}
 
-		static XYChart.Series series;
-
 	static double growthValue;
 	static double closenessValue;
 	static double tankOverflowRiskValue;
@@ -78,70 +77,16 @@ public class MainPanel extends Application {
 		frame.setSize(800,800);
 		frame.setVisible(true);
 
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				initFX(fxPanel);
-			}
-		});
 	}
 
-		static BorderPane pane;
-		static BarChart<String, Number> chart;
-	private static void initFX(JFXPanel fxPanel) {
-		// This method is invoked on JavaFX thread
-
-		Text text = new Text("GrowuthVal = " + growthValue);
-		text.setFont(new Font(24));
-		text.setEffect(new Reflection());
-
-		pane = new BorderPane();
-		pane.setCenter(text);
-		//defining the axes
-		final NumberAxis xAxis = new NumberAxis();
-		final NumberAxis yAxis = new NumberAxis();
-		xAxis.setLabel("Number of Month");
-//		//creating the chart
-//		final LineChart<Number,Number> lineChart =
-//				new LineChart<Number,Number>(xAxis,yAxis);
-//
-//		lineChart.setTitle("Stock Monitoring, 2010");
-//		//defining a series
-//		series = new XYChart.Series();
-//		series.setName("Growth of pump");
-//		//populating the series with data
-
-
-		chart = new BarChart<>(new CategoryAxis(), new NumberAxis());
-
-		series = new XYChart.Series<>();
-		chart.getData().add(series);
-
-
-//		lineChart.getData().add(series);
-		pane.setTop(chart);
-		fxPanel.setScene(new Scene(pane, 600, 800));
-	}
-
-    private static void showStatus() {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				initAndShowGUI();
-			}
-		});
-
-
-    }
 
 	private static void runSimulation() { new JFXPanel();
-			showStatus();
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		Platform.runLater(() ->{
+		new JFXPanel();
 				Engine engine = new Engine();
 		engine.setName("EmergencyPredictor");
 
@@ -235,7 +180,7 @@ public class MainPanel extends Application {
 			throw new RuntimeException(
 					"Engine not ready. " + "The following errors were encountered:\n" + status.toString());
 		}
-
+        showChartDialog();
 		for (int i = 1; !emergencyStop; i++) {
 			growthValue = tGrowth.getMinimum() + i * (tGrowth.range() / 5);
 			tGrowth.setInputValue(growthValue);
@@ -262,31 +207,18 @@ public class MainPanel extends Application {
 									Op.str(growthValue), Op.str(closenessValue), Op.str(tankOverflowRiskValue),
 									Op.str(action.getOutputValue()), action.fuzzyOutputValue()));
 					notifier(Notifications.create().title("Предупреждение")
-							.text(String.format(
-									"рост=%s, близость=%s, риск переполнения бака=%s -> "
-											+ "Действие.output=%s, действие=%s",
-									Op.str(growthValue), Op.str(closenessValue), Op.str(tankOverflowRiskValue),
-									Op.str(action.getOutputValue()), action.fuzzyOutputValue()))
-							.position(Pos.TOP_RIGHT), tankOverflowRiskValue);
-					SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-					Date date = new Date();
-					date.setTime(date.getTime() + i * 11111);
-					if(series!=null)
-					{series.getData().add(new XYChart.Data(dateFormat.format(date), tankOverflowRiskValue));
-						if(chart!=null){chart.getData().clear();chart.getData().add(series);}}
-
-
-//		lineChart.getData().add(series);
-					pane.setTop(chart);
-					frame.repaint();
-//						series.getData().add(new XYChart.Data(i,tankOverflowRiskValue ));
+                            .text(String.format(
+                                    "рост=%s, близость=%s, риск переполнения бака=%s -> "
+                                            + "Действие.output=%s, действие=%s",
+                                    Op.str(growthValue), Op.str(closenessValue), Op.str(tankOverflowRiskValue),
+                                    Op.str(action.getOutputValue()), action.fuzzyOutputValue()))
+                            .position(Pos.TOP_RIGHT), tankOverflowRiskValue);
 
 				}
 
 			}
 
 		}
-		});
 
 	}
 
@@ -294,6 +226,7 @@ public class MainPanel extends Application {
 		Platform.runLater(() -> {
 			alertDialogShown = true;
 			Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.initStyle(StageStyle.UTILITY);
 			alert.setTitle("Выбор действия");
 			alert.setHeaderText("Выберите действие для предотвращения аварии");
 			alert.setContentText("Отключить подачу воды из:");
@@ -334,6 +267,58 @@ public class MainPanel extends Application {
 			alertDialogShown = false;
 		});
 	}
+
+    private static void showChartDialog() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.initStyle(StageStyle.UTILITY);
+            alert.setTitle("Выбор действия");
+            alert.setHeaderText("Выберите действие для предотвращения аварии");
+            alert.setContentText("Отключить подачу воды из:");
+
+            Text text = new Text("GrowuthVal = " + growthValue);
+            text.setFont(new Font(24));
+            text.setEffect(new Reflection());
+            DialogPane pane;
+            BarChart<String, Number> chart;
+            pane = new DialogPane();
+            //defining the axes
+            final NumberAxis xAxis = new NumberAxis();
+            final NumberAxis yAxis = new NumberAxis();
+            xAxis.setLabel("Number of Month");
+
+
+            chart = new BarChart<>(new CategoryAxis(), new NumberAxis());
+
+
+            XYChart.Series series;
+            series = new XYChart.Series<>();
+            chart.getData().add(series);
+
+
+//		lineChart.getData().add(series);
+            pane.setContent(chart);
+            alert.setDialogPane(pane);
+            ButtonType buttonTypeCancel = new ButtonType("Отменить", ButtonData.CANCEL_CLOSE);
+
+            alert.getButtonTypes().setAll(
+                    buttonTypeCancel);
+
+            Optional<ButtonType> result = alert.showAndWait();
+            while (true){
+                SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+                Date date = new Date();
+                date.setTime(date.getTime());
+//                try {
+//                    if (series != null) {
+//                        series.getData().add(new XYChart.Data(dateFormat.format(date), tankOverflowRiskValue));
+//                    }
+//                }catch (IllegalArgumentException ex){
+//
+//                }
+            }
+        });
+    }
 
 	private static void notifier(Notifications notif, double dangerLevel) {
 		Platform.runLater(() -> {
