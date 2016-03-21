@@ -29,6 +29,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.Notifications;
 import java.util.Optional;
@@ -46,82 +47,82 @@ public class MainPanel extends Application {
     engine.setName("EmergencyPredictor");
 
     InputVariable tGrowth = new InputVariable();
-    tGrowth.setName("Growth");
+    tGrowth.setName("Рост");
     tGrowth.setRange(0.000, 1.000);
-    tGrowth.addTerm(new Triangle("Slow", 0.000, 0.250, 0.500));
-    tGrowth.addTerm(new Triangle("Normal", 0.250, 0.500, 0.750));
-    tGrowth.addTerm(new Triangle("Fast", 0.500, 0.750, 1.000));
+    tGrowth.addTerm(new Triangle("Низкий", 0.000, 0.250, 0.500));
+    tGrowth.addTerm(new Triangle("Нормальный", 0.250, 0.500, 0.750));
+    tGrowth.addTerm(new Triangle("Быстрый", 0.500, 0.750, 1.000));
     engine.addInputVariable(tGrowth);
 
     InputVariable tCloseness = new InputVariable();
-    tCloseness.setName("Closeness");
+    tCloseness.setName("Близость");
     tCloseness.setRange(0.000, 1.000);
-    tCloseness.addTerm(new Triangle("Far", 0.000, 0.250, 0.500));
-    tCloseness.addTerm(new Triangle("Medium", 0.250, 0.500, 0.750));
-    tCloseness.addTerm(new Triangle("Near", 0.500, 0.750, 1.000));
+    tCloseness.addTerm(new Triangle("Маленькая", 0.000, 0.250, 0.500));
+    tCloseness.addTerm(new Triangle("Средняя", 0.250, 0.500, 0.750));
+    tCloseness.addTerm(new Triangle("Близкая", 0.500, 0.750, 1.000));
     engine.addInputVariable(tCloseness);
 
     InputVariable tankOverflowRisk = new InputVariable();
-    tankOverflowRisk.setName("Risk");
+    tankOverflowRisk.setName("Риск");
     tankOverflowRisk.setRange(0.000, 1.000);
-    tankOverflowRisk.addTerm(new Triangle("Low", 0.000, 0.250, 0.500));
-    tankOverflowRisk.addTerm(new Triangle("Medium", 0.250, 0.500, 0.750));
-    tankOverflowRisk.addTerm(new Triangle("High", 0.500, 0.750, 1.000));
+    tankOverflowRisk.addTerm(new Triangle("Низкий", 0.000, 0.250, 0.500));
+    tankOverflowRisk.addTerm(new Triangle("Нормальный", 0.250, 0.500, 0.750));
+    tankOverflowRisk.addTerm(new Triangle("Высокий", 0.500, 0.750, 1.000));
     engine.addInputVariable(tankOverflowRisk);
 
     OutputVariable action = new OutputVariable();
-    action.setName("Action");
+    action.setName("Действие");
     action.setRange(0.000, 1.000);
     action.setDefaultValue(Double.NaN);
-    action.addTerm(new Triangle("DoNothing", 0.000, 0.250, 0.500));
-    action.addTerm(new Triangle("YieldDecisionToUser", 0.250, 0.500, 0.750));
-    action.addTerm(new Triangle("EmergencyStop", 0.500, 0.750, 1.000));
+    action.addTerm(new Triangle("Ничего_не_делать", 0.000, 0.250, 0.500));
+    action.addTerm(new Triangle("Предоставить_решение_пользователю", 0.250, 0.500, 0.750));
+    action.addTerm(new Triangle("Экстренная_остановка", 0.500, 0.750, 1.000));
     engine.addOutputVariable(action);
 
     RuleBlock ruleBlock = new RuleBlock("firstBlock", new Minimum(), new Maximum(), new Minimum());
-    ruleBlock.addRule(Rule.parse("if Growth is Fast and Closeness is Near then Action is EmergencyStop",
+    ruleBlock.addRule(Rule.parse("if Рост is Быстрый and Близость is Близкая then Действие is Экстренная_остановка",
         engine));
 
-    ruleBlock.addRule(Rule.parse("if Growth is Fast and Closeness is Medium then Action is " +
-            "YieldDecisionToUser",
+    ruleBlock.addRule(Rule.parse("if Рост is Быстрый and Близость is Средняя then Действие is " +
+            "Предоставить_решение_пользователю",
         engine));
-    ruleBlock.addRule(Rule.parse("if Growth is Fast and Closeness is Far then Action is " +
-            "YieldDecisionToUser",
+    ruleBlock.addRule(Rule.parse("if Рост is Быстрый and Близость is Маленькая then Действие is " +
+            "Предоставить_решение_пользователю",
         engine));
-    ruleBlock.addRule(Rule.parse("if Growth is Normal and Closeness is Near then Action is YieldDecisionToUser",
+    ruleBlock.addRule(Rule.parse("if Рост is Нормальный and Близость is Близкая then Действие is Предоставить_решение_пользователю",
         engine));
-    ruleBlock.addRule(Rule.parse("if Growth is Normal and Closeness is Medium then Action is DoNothing",
+    ruleBlock.addRule(Rule.parse("if Рост is Нормальный and Близость is Средняя then Действие is Ничего_не_делать",
         engine));
-    ruleBlock.addRule(Rule.parse("if Growth is Normal and Closeness is Far then Action is DoNothing",
+    ruleBlock.addRule(Rule.parse("if Рост is Нормальный and Близость is Маленькая then Действие is Ничего_не_делать",
         engine));
-    ruleBlock.addRule(Rule.parse("if Growth is Slow and Closeness is Near then Action is " +
-            "YieldDecisionToUser",
+    ruleBlock.addRule(Rule.parse("if Рост is Низкий and Близость is Близкая then Действие is " +
+            "Предоставить_решение_пользователю",
         engine));
-    ruleBlock.addRule(Rule.parse("if Growth is Slow and Closeness is Medium then Action is DoNothing",
+    ruleBlock.addRule(Rule.parse("if Рост is Низкий and Близость is Средняя then Действие is Ничего_не_делать",
         engine));
-    ruleBlock.addRule(Rule.parse("if Growth is Slow and Closeness is Far then Action is DoNothing",
+    ruleBlock.addRule(Rule.parse("if Рост is Низкий and Близость is Маленькая then Действие is Ничего_не_делать",
         engine));
-    ruleBlock.addRule(Rule.parse("if Risk is High and Closeness is Medium and Growth is Fast " +
-            "then Action is " +
-            "EmergencyStop",
+    ruleBlock.addRule(Rule.parse("if Риск is Высокий and Близость is Средняя and Рост is Быстрый " +
+            "then Действие is " +
+            "Экстренная_остановка",
         engine));
 
-    ruleBlock.addRule(Rule.parse("if Risk is High and Closeness is Near then Action is " +
-            "YieldDecisionToUser",
+    ruleBlock.addRule(Rule.parse("if Риск is Высокий and Близость is Близкая then Действие is " +
+            "Предоставить_решение_пользователю",
         engine));
-    ruleBlock.addRule(Rule.parse("if Risk is High and Closeness is Medium then Action is YieldDecisionToUser",
+    ruleBlock.addRule(Rule.parse("if Риск is Высокий and Близость is Средняя then Действие is Предоставить_решение_пользователю",
         engine));
-    ruleBlock.addRule(Rule.parse("if Risk is High and Closeness is Far then Action is EmergencyStop",
+    ruleBlock.addRule(Rule.parse("if Риск is Высокий and Близость is Маленькая then Действие is Экстренная_остановка",
         engine));
-    ruleBlock.addRule(Rule.parse("if Risk is Medium and Closeness is Near then Action is " +
-            "DoNothing",
+    ruleBlock.addRule(Rule.parse("if Риск is Нормальный and Близость is Близкая then Действие is " +
+            "Ничего_не_делать",
         engine));
-    ruleBlock.addRule(Rule.parse("if Risk is Medium and Closeness is Medium then Action is YieldDecisionToUser",
+    ruleBlock.addRule(Rule.parse("if Риск is Нормальный and Близость is Средняя then Действие is Предоставить_решение_пользователю",
         engine));
-    ruleBlock.addRule(Rule.parse("if Risk is Medium and Closeness is Far then Action is YieldDecisionToUser",
+    ruleBlock.addRule(Rule.parse("if Риск is Нормальный and Близость is Маленькая then Действие is Предоставить_решение_пользователю",
         engine));
-    ruleBlock.addRule(Rule.parse("if Risk is Low and Growth is Fast then Action is " +
-            "YieldDecisionToUser",
+    ruleBlock.addRule(Rule.parse("if Риск is Низкий and Рост is Быстрый then Действие is " +
+            "Предоставить_решение_пользователю",
         engine));
     engine.addRuleBlock(ruleBlock);
 
@@ -157,15 +158,15 @@ public class MainPanel extends Application {
           FuzzyLite.logger().info(
               String.format(
                   "growth=%s, closeness=%s, tankOverflowRisk=%s -> "
-                      + "Action.output=%s, action=%s",
+                      + "Действие.output=%s, action=%s",
                   Op.str(growthValue),
                   Op.str(closenessValue),
                   Op.str(tankOverflowRiskValue),
                   Op.str(action.getOutputValue()),
                   action.fuzzyOutputValue()));
-          notifier(Notifications.create().title("Emergency").text(String.format(
-              "growth=%s, closeness=%s, tankOverflowRisk=%s -> "
-                  + "Action.output=%s, action=%s",
+          notifier(Notifications.create().title("Предупреждение").text(String.format(
+              "рост=%s, близость=%s, риск переполнения бака=%s -> "
+                  + "Действие.output=%s, действие=%s",
               Op.str(growthValue),
               Op.str(closenessValue),
               Op.str(tankOverflowRiskValue),
@@ -189,7 +190,7 @@ public class MainPanel extends Application {
     Platform.runLater(() -> {
           Alert alert = new Alert(AlertType.CONFIRMATION);
           alert.setTitle("Подтверждение");
-          alert.setHeaderText("Look, a Confirmation Dialog with Custom Actions");
+          alert.setHeaderText("Look, a Confirmation Dialog with Custom Действиеs");
           alert.setContentText("Choose your option.");
 
           ButtonType buttonTypeOne = new ButtonType("One");
@@ -224,12 +225,13 @@ public class MainPanel extends Application {
           owner.setHeight(1);
           owner.toBack();
           owner.show();
+          notif.hideAfter(new Duration(600));
           if(dangerLevel > 0.5d){
-            notif.show();
+            notif.showError();
           }
-          if(dangerLevel > 0.0d  && dangerLevel <= 0.3d){
-            notif.showInformation();
-          }
+//          if(dangerLevel > 0.0d  && dangerLevel <= 0.3d){
+//            notif.showInformation();
+//          }
           if(dangerLevel > 0.3d  && dangerLevel <= 0.5d){
             notif.showWarning();
           }
