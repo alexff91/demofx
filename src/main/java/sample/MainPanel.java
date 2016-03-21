@@ -187,166 +187,41 @@ public class MainPanel extends Application {
 
 			for (int j = 1; j < 3; j++) {
 
-				closenessValue = tCloseness.getMinimum() + i * (tCloseness.range() / 5);
-				tCloseness.setInputValue(closenessValue);
-
-				for (int k = 1; k < 3; k++) {
-
-					tankOverflowRiskValue = tankOverflowRisk.getMinimum() + i * (tankOverflowRisk.range() / 5);
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					tCloseness.setInputValue(tankOverflowRiskValue);
-					engine.process();
-					FuzzyLite.logger()
-							.info(String.format(
-									"growth=%s, closeness=%s, tankOverflowRisk=%s -> "
-											+ "Действие.output=%s, action=%s",
-									Op.str(growthValue), Op.str(closenessValue), Op.str(tankOverflowRiskValue),
-									Op.str(action.getOutputValue()), action.fuzzyOutputValue()));
-					notifier(Notifications.create().title("Предупреждение")
-                            .text(String.format(
-                                    "рост=%s, близость=%s, риск переполнения бака=%s -> "
-                                            + "Действие.output=%s, действие=%s",
-                                    Op.str(growthValue), Op.str(closenessValue), Op.str(tankOverflowRiskValue),
-                                    Op.str(action.getOutputValue()), action.fuzzyOutputValue()))
-                            .position(Pos.TOP_RIGHT), tankOverflowRiskValue);
-
-				}
-
-			}
-
-		}
-
-	}
-
-	private static void showDialog() {
-		Platform.runLater(() -> {
-			alertDialogShown = true;
-			Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.initStyle(StageStyle.UTILITY);
-			alert.setTitle("Выбор действия");
-			alert.setHeaderText("Выберите действие для предотвращения аварии");
-			alert.setContentText("Отключить подачу воды из:");
-
-			ButtonType buttonTypeOne = new ButtonType("Первая ёмкость");
-			ButtonType buttonTypeTwo = new ButtonType("Вторая ёмкость");
-			ButtonType buttonTypeThree = new ButtonType("Третья ёмкость");
-			ButtonType buttonTypeAll = new ButtonType("Все ёмкости");
-			ButtonType buttonTypeCancel = new ButtonType("Отменить", ButtonData.CANCEL_CLOSE);
-
-			alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo, buttonTypeThree, buttonTypeAll,
-					buttonTypeCancel);
-
-			Optional<ButtonType> result = alert.showAndWait();
-			if (result.get() == buttonTypeOne) {
-				growthValue = growthValue / 3;
-				closenessValue = closenessValue / 3;
-				tankOverflowRiskValue = tankOverflowRiskValue / 3;
-				alert.close();
-			} else if (result.get() == buttonTypeTwo) {
-				growthValue = growthValue / 2;
-				closenessValue = closenessValue / 2;
-				tankOverflowRiskValue = tankOverflowRiskValue / 2;
-				alert.close();
-			} else if (result.get() == buttonTypeThree) {
-                growthValue = growthValue / 4;
-                closenessValue = growthValue / 4;
-                tankOverflowRiskValue = tankOverflowRiskValue / 4;
-                alert.close();
-            }
-            else if (result.get() == buttonTypeAll) {
-                emergencyStop =true;
-                alert.close();
-            }
-            else {
-				// ... user chose CANCEL or closed the dialog
-			}
-			alertDialogShown = false;
-		});
-	}
-
-    private static void showChartDialog() {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(AlertType.INFORMATION);
-            alert.initStyle(StageStyle.UTILITY);
-            alert.setTitle("Выбор действия");
-            alert.setHeaderText("Выберите действие для предотвращения аварии");
-            alert.setContentText("Отключить подачу воды из:");
-
-            Text text = new Text("GrowuthVal = " + growthValue);
-            text.setFont(new Font(24));
-            text.setEffect(new Reflection());
-            DialogPane pane;
-            BarChart<String, Number> chart;
-            pane = new DialogPane();
-            //defining the axes
-            final NumberAxis xAxis = new NumberAxis();
-            final NumberAxis yAxis = new NumberAxis();
-            xAxis.setLabel("Number of Month");
-
-
-            chart = new BarChart<>(new CategoryAxis(), new NumberAxis());
-
-
-            XYChart.Series series;
-            series = new XYChart.Series<>();
-            chart.getData().add(series);
-
-
-//		lineChart.getData().add(series);
-            pane.setContent(chart);
-            alert.setDialogPane(pane);
-            ButtonType buttonTypeCancel = new ButtonType("Отменить", ButtonData.CANCEL_CLOSE);
-
-            alert.getButtonTypes().setAll(
-                    buttonTypeCancel);
-
-            Optional<ButtonType> result = alert.showAndWait();
-            while (true){
-                SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-                Date date = new Date();
-                date.setTime(date.getTime());
-//                try {
-//                    if (series != null) {
-//                        series.getData().add(new XYChart.Data(dateFormat.format(date), tankOverflowRiskValue));
-//                    }
-//                }catch (IllegalArgumentException ex){
-//
-//                }
-            }
-        });
-    }
-
-	private static void notifier(Notifications notif, double dangerLevel) {
-		Platform.runLater(() -> {
-			Stage owner = new Stage(StageStyle.TRANSPARENT);
-			StackPane root = new StackPane();
-			root.setStyle("-fx-background-color: TRANSPARENT");
-			Scene scene = new Scene(root, 1, 1);
-			scene.setFill(Color.TRANSPARENT);
-			owner.setScene(scene);
-			owner.setWidth(1);
-			owner.setHeight(1);
-			owner.toBack();
-			owner.show();
-			notif.hideAfter(new Duration(600));
-			if (!alertDialogShown) {
-				if (dangerLevel > 0.5d) {
-					notif.showError();
-					showDialog();
-				}
-				if (dangerLevel > 0.0d && dangerLevel <= 0.3d) {
-					notif.showInformation();
-				}
-				if (dangerLevel > 0.3d && dangerLevel <= 0.5d) {
-					notif.showWarning();
-				}
-			}
-		});
-	}
-
-
+          Optional<ButtonType> result = alert.showAndWait();
+          if (result.get() == buttonTypeOne){
+            // ... user chose "One"
+          } else if (result.get() == buttonTypeTwo) {
+            // ... user chose "Two"
+          } else if (result.get() == buttonTypeThree) {
+            // ... user chose "Three"
+          } else {
+            // ... user chose CANCEL or closed the dialog
+          }
+        }
+    );
+  }
+  private static void notifier(Notifications notif, double dangerLevel) {
+    Platform.runLater(() -> {
+          Stage owner = new Stage(StageStyle.TRANSPARENT);
+          StackPane root = new StackPane();
+          root.setStyle("-fx-background-color: TRANSPARENT");
+          Scene scene = new Scene(root, 1, 1);
+          scene.setFill(Color.TRANSPARENT);
+          owner.setScene(scene);
+          owner.setWidth(1);
+          owner.setHeight(1);
+          owner.toBack();
+          owner.show();
+          if(dangerLevel > 0.5d){
+            notif.show();
+          }
+          if(dangerLevel > 0.0d  && dangerLevel <= 0.3d){
+            notif.showInformation();
+          }
+          if(dangerLevel > 0.3d  && dangerLevel <= 0.5d){
+            notif.showWarning();
+          }
+        }
+    );
+  }
 }
