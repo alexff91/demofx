@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Jpopuper">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/Jpopuper.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
