@@ -8,6 +8,22 @@
     <artifactId>demofx</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <repositories>
+        <repository>
+            <id>utgard</id>
+            <name>utgard releases</name>
+            <url>http://repo.openscada.org/maven/releases</url>
+        </repository>
+        <repository>
+            <id>neuroph.sourceforge.net</id>
+            <url>http://neuroph.sourceforge.net/maven2/</url>
+        </repository>
+        <repository>
+            <id>WSO2</id>
+            <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+
 
     <!-- Output to jar format -->
     <packaging>jar</packaging>

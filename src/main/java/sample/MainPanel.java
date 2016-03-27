@@ -17,6 +17,8 @@ import com.fuzzylite.rule.RuleBlock;
 import com.fuzzylite.term.Triangle;
 import com.fuzzylite.variable.InputVariable;
 import com.fuzzylite.variable.OutputVariable;
+import org.jfree.data.time.Millisecond;
+import org.jfree.ui.RefineryUtilities;
 import popup.ssn.NotificationPopup;
 
 import javax.swing.*;
@@ -33,10 +35,90 @@ public class MainPanel {
     static double tankOverflowRiskValue;
 
     public static void main(String[] args) {
-
+        initClosenessValueChart();
+initGrowthValueChart();
+        initRiskValueChart();
         runSimulation();
 
 
+    }
+
+    private static void initClosenessValueChart() {
+        final DynamicDataDemo demo = new DynamicDataDemo("Closeness Value");
+
+        Thread th  = new Thread(() -> {
+            while(true) {
+                demo.lastValue = closenessValue;
+                final Millisecond now = new Millisecond();
+                System.out.println("Now = " + now.toString());
+                demo.series.add(new Millisecond(), demo.lastValue);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        th.start();
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                demo.pack();
+                demo.setVisible(true);
+            }
+        });
+    }
+
+    private static void initGrowthValueChart() {
+        final DynamicDataDemo demo = new DynamicDataDemo("Growth value");
+
+        Thread th  = new Thread(() -> {
+            while(true) {
+                demo.lastValue = growthValue;
+                final Millisecond now = new Millisecond();
+                System.out.println("Now = " + now.toString());
+                demo.series.add(new Millisecond(), demo.lastValue);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        th.start();
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                demo.pack();
+                demo.setVisible(true);
+            }
+        });
+    }
+
+    private static void initRiskValueChart() {
+        final DynamicDataDemo demo = new DynamicDataDemo("Tank Overflow Risk");
+
+        Thread th  = new Thread(() -> {
+            while(true) {
+                demo.lastValue = tankOverflowRiskValue;
+                final Millisecond now = new Millisecond();
+                System.out.println("Now = " + now.toString());
+                demo.series.add(new Millisecond(), demo.lastValue);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        th.start();
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                demo.pack();
+                demo.setVisible(true);
+            }
+        });
     }
 
     private static Engine engine = new Engine();
@@ -64,56 +146,56 @@ public class MainPanel {
         action.setName("ACTION");
         action.setRange(0.000, 1.000);
         action.setDefaultValue(Double.NaN);
-        action.addTerm(new Triangle("Ничего_не_делать", 0.000, 0.250, 0.500));
-        action.addTerm(new Triangle("Предоставить_решение_пользователю", 0.250, 0.500, 0.750));
-        action.addTerm(new Triangle("Экстренная_остановка", 0.500, 0.750, 1.000));
+        action.addTerm(new Triangle("DO_NOTHING", 0.000, 0.250, 0.500));
+        action.addTerm(new Triangle("USER_DECISION", 0.250, 0.500, 0.750));
+        action.addTerm(new Triangle("EMERGENCY_STOP", 0.500, 0.750, 1.000));
         engine.addOutputVariable(action);
 
         RuleBlock ruleBlock = new RuleBlock("firstBlock", new Minimum(), new Maximum(), new Minimum());
         ruleBlock.addRule(
-                Rule.parse("if GROWTH is HIGH and CLOSENESS is HIGH then ACTION is Экстренная_остановка", engine));
+                Rule.parse("if GROWTH is HIGH and CLOSENESS is HIGH then ACTION is EMERGENCY_STOP", engine));
 
         ruleBlock.addRule(Rule.parse(
-                "if GROWTH is HIGH and CLOSENESS is NORMAL then ACTION is " + "Предоставить_решение_пользователю",
+                "if GROWTH is HIGH and CLOSENESS is NORMAL then ACTION is " + "USER_DECISION",
                 engine));
         ruleBlock.addRule(Rule.parse(
-                "if GROWTH is HIGH and CLOSENESS is LOW then ACTION is " + "Предоставить_решение_пользователю",
+                "if GROWTH is HIGH and CLOSENESS is LOW then ACTION is " + "USER_DECISION",
                 engine));
         ruleBlock.addRule(Rule.parse(
-                "if GROWTH is NORMAL and CLOSENESS is HIGH then ACTION is Предоставить_решение_пользователю",
+                "if GROWTH is NORMAL and CLOSENESS is HIGH then ACTION is USER_DECISION",
                 engine));
         ruleBlock.addRule(
-                Rule.parse("if GROWTH is NORMAL and CLOSENESS is NORMAL then ACTION is Ничего_не_делать", engine));
+                Rule.parse("if GROWTH is NORMAL and CLOSENESS is NORMAL then ACTION is DO_NOTHING", engine));
         ruleBlock.addRule(Rule
-                .parse("if GROWTH is NORMAL and CLOSENESS is LOW then ACTION is Ничего_не_делать", engine));
+                .parse("if GROWTH is NORMAL and CLOSENESS is LOW then ACTION is DO_NOTHING", engine));
         ruleBlock.addRule(Rule.parse(
-                "if GROWTH is LOW and CLOSENESS is HIGH then ACTION is " + "Предоставить_решение_пользователю",
+                "if GROWTH is LOW and CLOSENESS is HIGH then ACTION is " + "USER_DECISION",
                 engine));
         ruleBlock.addRule(
-                Rule.parse("if GROWTH is LOW and CLOSENESS is NORMAL then ACTION is Ничего_не_делать", engine));
+                Rule.parse("if GROWTH is LOW and CLOSENESS is NORMAL then ACTION is DO_NOTHING", engine));
         ruleBlock.addRule(
-                Rule.parse("if GROWTH is LOW and CLOSENESS is LOW then ACTION is Ничего_не_делать", engine));
+                Rule.parse("if GROWTH is LOW and CLOSENESS is LOW then ACTION is DO_NOTHING", engine));
         ruleBlock.addRule(Rule.parse("if RISK is HIGH and CLOSENESS is NORMAL and GROWTH is HIGH "
-                + "then ACTION is " + "Экстренная_остановка", engine));
+                + "then ACTION is " + "EMERGENCY_STOP", engine));
 
         ruleBlock.addRule(Rule.parse(
-                "if RISK is HIGH and CLOSENESS is HIGH then ACTION is " + "Предоставить_решение_пользователю",
+                "if RISK is HIGH and CLOSENESS is HIGH then ACTION is " + "USER_DECISION",
                 engine));
         ruleBlock.addRule(Rule.parse(
-                "if RISK is HIGH and CLOSENESS is NORMAL then ACTION is Предоставить_решение_пользователю",
+                "if RISK is HIGH and CLOSENESS is NORMAL then ACTION is USER_DECISION",
                 engine));
         ruleBlock.addRule(Rule
-                .parse("if RISK is HIGH and CLOSENESS is LOW then ACTION is Экстренная_остановка", engine));
+                .parse("if RISK is HIGH and CLOSENESS is LOW then ACTION is EMERGENCY_STOP", engine));
         ruleBlock.addRule(Rule
-                .parse("if RISK is NORMAL and CLOSENESS is HIGH then ACTION is " + "Ничего_не_делать", engine));
+                .parse("if RISK is NORMAL and CLOSENESS is HIGH then ACTION is " + "DO_NOTHING", engine));
         ruleBlock.addRule(Rule.parse(
-                "if RISK is NORMAL and CLOSENESS is NORMAL then ACTION is Предоставить_решение_пользователю",
+                "if RISK is NORMAL and CLOSENESS is NORMAL then ACTION is USER_DECISION",
                 engine));
         ruleBlock.addRule(Rule.parse(
-                "if RISK is NORMAL and CLOSENESS is LOW then ACTION is Предоставить_решение_пользователю",
+                "if RISK is NORMAL and CLOSENESS is LOW then ACTION is USER_DECISION",
                 engine));
         ruleBlock.addRule(Rule.parse(
-                "if RISK is LOW and GROWTH is HIGH then ACTION is " + "Предоставить_решение_пользователю",
+                "if RISK is LOW and GROWTH is HIGH then ACTION is " + "USER_DECISION",
                 engine));
         engine.addRuleBlock(ruleBlock);
 
@@ -127,17 +209,17 @@ public class MainPanel {
                     "Engine not ready. " + "The following errors were encountered:\n" + status.toString());
         }
         for (int i = 1; !emergencyStop; i++) {
-            growthValue = tGrowth.getMinimum() + i * (tGrowth.range() / 5);
+            growthValue = tGrowth.getMinimum() + i * (tGrowth.range() / 3);
             tGrowth.setInputValue(growthValue);
 
             for (int j = 1; j < 3; j++) {
 
-                closenessValue = tCloseness.getMinimum() + i * (tCloseness.range() / 5);
+                closenessValue = tCloseness.getMinimum() + i * (tCloseness.range() / 3);
                 tCloseness.setInputValue(closenessValue);
 
                 for (int k = 1; k < 3; k++) {
 
-                    tankOverflowRiskValue = tankOverflowRisk.getMinimum() + i * (tankOverflowRisk.range() / 5);
+                    tankOverflowRiskValue = tankOverflowRisk.getMinimum() + i * (tankOverflowRisk.range() / 3);
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -179,7 +261,7 @@ public class MainPanel {
 
         if (dangerLevel > 0.5d) {
             ImageIcon icon = new ImageIcon(MainPanel.class.getResource("/alarm.png"));
-            showErrorNotif(term, Color.ORANGE, icon);
+            showErrorNotif(term, new Color(249, 78, 30), icon);
         }
         if (dangerLevel > 0.0d && dangerLevel <= 0.3d) {
             ImageIcon icon = new ImageIcon(MainPanel.class.getResource("/info.png"));
