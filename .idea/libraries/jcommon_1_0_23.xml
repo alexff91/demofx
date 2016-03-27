@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="jcommon-1.0.23">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/jcommon-1.0.23.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/jfreechart-1.0.19-experimental.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/jfreechart-1.0.19-swt.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/jfreechart-1.0.19.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/jfreesvg-2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Jpopuper.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

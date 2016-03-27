@@ -1,6 +1,5 @@
 package sample;
 
-import ru.spbstu.dis.ep.data.Tag;
 
 import javax.swing.*;
 
@@ -24,12 +23,12 @@ public class FuzzyTagsEditor extends JPanel
         super(new BorderLayout());
 
         listModel = new DefaultListModel();
-//        listModel.addElement("Jane Doe");
-//        listModel.addElement("John Smith");
-//        listModel.addElement("Kathy Green");
-        for (Map.Entry<Tag, String> tagStringEntry : Tag.TAG_TO_ID_MAPPING.entrySet()) {
-            listModel.addElement(tagStringEntry.getKey() + "->" + tagStringEntry.getValue());
-        }
+        listModel.addElement("Jane Doe");
+        listModel.addElement("John Smith");
+        listModel.addElement("Kathy Green");
+//        for (Map.Entry<Tag, String> tagStringEntry : Tag.TAG_TO_ID_MAPPING.entrySet()) {
+//            listModel.addElement(tagStringEntry.getKey() + "->" + tagStringEntry.getValue());
+//        }
 
 
         //Create the list and put it in a scroll pane.

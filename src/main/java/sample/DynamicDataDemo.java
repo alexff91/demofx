@@ -3,7 +3,7 @@ package sample;
 /**
  * Created by a.fedorov on 27.03.2016.
  */
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -31,10 +31,11 @@ public class DynamicDataDemo extends ApplicationFrame implements ActionListener 
 
     /** The time series data. */
     TimeSeries series;
+    ChartPanel chartPanel;
 
     /** The most recent value added. */
-    protected double lastValue = 10;
-
+    protected double lastValue = 0;
+    final JPanel content = new JPanel(new FlowLayout());
     /**
      * Constructs a new demonstration application.
      *
@@ -47,17 +48,27 @@ public class DynamicDataDemo extends ApplicationFrame implements ActionListener 
         final TimeSeriesCollection dataset = new TimeSeriesCollection(this.series);
         final JFreeChart chart = createChart(dataset,title);
 
-        final ChartPanel chartPanel = new ChartPanel(chart);
-//        final JButton button = new JButton("Add New Data Item");
-//        button.setActionCommand("ADD_DATA");
-//        button.addActionListener(this);
+        chartPanel = new ChartPanel(chart);
 
-        final JPanel content = new JPanel(new BorderLayout());
+
         content.add(chartPanel);
-//        content.add(button, BorderLayout.SOUTH);
-        chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
+
+        chartPanel.setPreferredSize(new java.awt.Dimension(300, 270));
         setContentPane(content);
 
+        content.setSize(400,900);
+        setSize(400,900);
+    }
+
+    public void addChart(ChartPanel chart){
+        content.add(chart);
+    }
+
+    public void addButton(){
+        final JButton button = new JButton("Stop Station");
+        button.setActionCommand("ADD_DATA");
+        button.addActionListener(this);
+        content.add(button);
     }
 
     /**
@@ -104,11 +115,7 @@ public class DynamicDataDemo extends ApplicationFrame implements ActionListener 
      */
     public void actionPerformed(final ActionEvent e) {
         if (e.getActionCommand().equals("ADD_DATA")) {
-            final double factor = 0.90 + 0.2 * Math.random();
-            this.lastValue = this.lastValue * factor;
-            final Millisecond now = new Millisecond();
-            System.out.println("Now = " + now.toString());
-            this.series.add(new Millisecond(), this.lastValue);
+            System.exit(0);
         }
     }
 
