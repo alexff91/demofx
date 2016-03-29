@@ -10,7 +10,6 @@ import java.util.Random;
 
 import javax.swing.*;
 
-import akka.remote.transport.ThrottledAssociation;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -28,7 +27,7 @@ import org.jfree.ui.RefineryUtilities;
  * (random) data by clicking on a button.
  *
  */
-public class DynamicDataDemo extends ApplicationFrame implements ActionListener {
+public class DynamicDataChart extends ApplicationFrame implements ActionListener {
 
     /** The time series data. */
     TimeSeries series;
@@ -42,26 +41,28 @@ public class DynamicDataDemo extends ApplicationFrame implements ActionListener 
      *
      * @param title  the frame title.
      */
-    public DynamicDataDemo(final String title) {
-
+    public DynamicDataChart(final String title) {
         super(title);
+        final JPanel titlePanel = new JPanel(new FlowLayout());
+        titlePanel.add(new JLabel("Mixing Station control"));
+
         this.series = new TimeSeries(title, Millisecond.class);
         final TimeSeriesCollection dataset = new TimeSeriesCollection(this.series);
         final JFreeChart chart = createChart(dataset,title);
 
         chartPanel = new ChartPanel(chart);
 
-
+        content.add(titlePanel);
         content.add(chartPanel);
 
-        chartPanel.setPreferredSize(new java.awt.Dimension(300, 270));
+        chartPanel.setPreferredSize(new java.awt.Dimension(250, 250));
         setContentPane(content);
 		final Random random = new Random();
 		chart.setBackgroundPaint(new GradientPaint(0, 0, Color.white, 0, 1000,
 				new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256))));
         chart.setAntiAlias(true);
-		content.setSize(400, 900);
-		setSize(400, 900);
+		content.setSize(1200, 900);
+		setSize(1200, 900);
     }
 
     public void addChart(ChartPanel chart){
@@ -130,7 +131,7 @@ public class DynamicDataDemo extends ApplicationFrame implements ActionListener 
      */
     public static void main(final String[] args) {
 
-        final DynamicDataDemo demo = new DynamicDataDemo("Dynamic Data Demo");
+        final DynamicDataChart demo = new DynamicDataChart("Dynamic Data Demo");
 
         Thread th  = new Thread(() -> {
           while(true) { final double factor = 0.90 + 0.2 * Math.random();
