@@ -6,6 +6,7 @@ package sample;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
 
 import javax.swing.*;
 
@@ -55,9 +56,12 @@ public class DynamicDataDemo extends ApplicationFrame implements ActionListener 
 
         chartPanel.setPreferredSize(new java.awt.Dimension(300, 270));
         setContentPane(content);
-
-        content.setSize(400,900);
-        setSize(400,900);
+		final Random random = new Random();
+		chart.setBackgroundPaint(new GradientPaint(0, 0, Color.white, 0, 1000,
+				new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256))));
+        chart.setAntiAlias(true);
+		content.setSize(400, 900);
+		setSize(400, 900);
     }
 
     public void addChart(ChartPanel chart){

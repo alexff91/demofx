@@ -52,11 +52,33 @@ public class MainPanel {
 		initClosenessValueChart();
 		initGrowthValueChart();
 		initRiskValueChart();
+        initThermometerChart();
 		runSimulation();
 
 	}
 
-	private static DynamicDataDemo closenessChartFrame = new DynamicDataDemo("Closeness Value");
+    private static void initThermometerChart() {
+        final Thermometer demo = new Thermometer("Heat station temperature");
+
+        Thread th = new Thread(() -> {
+            while (true) {
+                demo.value = growthValue;
+                demo.dataset.setValue(growthValue*10);
+                final Millisecond now = new Millisecond();
+                System.out.println("Now = " + now.toString());
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        th.start();
+
+        closenessChartFrame.addChart(demo.chartPanel);
+    }
+
+    private static DynamicDataDemo closenessChartFrame = new DynamicDataDemo("Closeness Value");
 
 	private static void initClosenessValueChart() {
 
@@ -266,9 +288,9 @@ public class MainPanel {
 					}
 					FuzzyLite.logger()
 							.info(String.format(
-									"growth=%s, closeness=%s, tankOverflowRisk=%s -> " + "ACTION.output=%s, action=%s",
-									Op.str(growthValue), Op.str(closenessValue), Op.str(tankOverflowRiskValue),
-									Op.str(action.getOutputValue()), action.fuzzyOutputValue()));
+                                    "growth=%s, closeness=%s, tankOverflowRisk=%s -> " + "ACTION.output=%s, action=%s",
+                                    Op.str(growthValue), Op.str(closenessValue), Op.str(tankOverflowRiskValue),
+                                    Op.str(action.getOutputValue()), action.fuzzyOutputValue()));
 					notifier(String.format(
 							"GROWTH=%s,\nCLOSENESS=%s,\nOVERFLOW_RISK=%s " + "->\n"
 									+ " RECOMMENDED ACTION=%s,\nACTIONS=%s",
@@ -297,18 +319,18 @@ public class MainPanel {
             String term,
             double dangerLevel) {
 
-		if (dangerLevel > 0.5d) {
-			ImageIcon icon = new ImageIcon(MainPanel.class.getResource("/alarm.png"));
-			showErrorNotif(term, new Color(249, 78, 30), icon);
-		}
-		if (dangerLevel > 0.0d && dangerLevel <= 0.3d) {
-			ImageIcon icon = new ImageIcon(MainPanel.class.getResource("/info.png"));
-			showErrorNotif(term, new Color(127, 176, 72), icon);
-		}
-		if (dangerLevel > 0.3d && dangerLevel <= 0.5d) {
-			ImageIcon icon = new ImageIcon(MainPanel.class.getResource("/warning.png"));
-			showErrorNotif(term, new Color(249, 236, 100), icon);
-		}
+//		if (dangerLevel > 0.5d) {
+//			ImageIcon icon = new ImageIcon(MainPanel.class.getResource("/alarm.png"));
+//			showErrorNotif(term, new Color(249, 78, 30), icon);
+//		}
+//		if (dangerLevel > 0.0d && dangerLevel <= 0.3d) {
+//			ImageIcon icon = new ImageIcon(MainPanel.class.getResource("/info.png"));
+//			showErrorNotif(term, new Color(127, 176, 72), icon);
+//		}
+//		if (dangerLevel > 0.3d && dangerLevel <= 0.5d) {
+//			ImageIcon icon = new ImageIcon(MainPanel.class.getResource("/warning.png"));
+//			showErrorNotif(term, new Color(249, 236, 100), icon);
+//		}
 	}
 
 	private static void showErrorNotif(String term, Color color, ImageIcon icon) {
