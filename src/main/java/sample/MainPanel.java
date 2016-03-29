@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 import com.fuzzylite.Engine;
 import com.fuzzylite.FuzzyLite;
 import com.fuzzylite.Op;
@@ -17,7 +18,9 @@ import com.fuzzylite.term.Triangle;
 import com.fuzzylite.variable.InputVariable;
 import com.fuzzylite.variable.OutputVariable;
 import org.jfree.data.time.Millisecond;
+import org.jfree.ui.RefineryUtilities;
 import popup.ssn.NotificationPopup;
+import sun.plugin.util.UIUtil;
 
 import javax.swing.*;
 
@@ -40,25 +43,28 @@ class MainPanel {
                                                       1.000);
 
     private static boolean alertDialogShown = false;
-
     private static boolean emergencyStop = false;
-
     static double growthValue;
-
     static double closenessValue;
-
     static double tankOverflowRiskValue;
 
-    public static
-    void main(String[] args) {
-        initGrowthValueChart();
-        initRiskValueChart();
-
+    public static void main(String[] args) {
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            // If Nimbus is not available, you can set the GUI to another look and feel.
+        }
         initClosenessValueChart();
-
-
-
+initGrowthValueChart();
+        initRiskValueChart();
         runSimulation();
+
+
     }
 
     private static DynamicDataDemo closenessChartFrame = new DynamicDataDemo("Closeness Value");
@@ -68,6 +74,10 @@ class MainPanel {
         Thread th = new Thread(() -> {
             while (true) {
                 closenessChartFrame.lastValue = closenessValue;
+    
+        Thread th  = new Thread(() -> {
+            while(true) {
+                demo.lastValue = closenessValue;
                 final Millisecond now = new Millisecond();
                 System.out.println("Now = " + now.toString());
                 closenessChartFrame.series.add(new Millisecond(),
@@ -273,21 +283,18 @@ class MainPanel {
                  j < 3;
                  j++) {
 
-                closenessValue = tCloseness.getMinimum() + j * (tCloseness.range() / 10);
+                closenessValue = tCloseness.getMinimum() + i * (tCloseness.range() / 3);
                 tCloseness.setInputValue(closenessValue);
 
-                for (int k = 1;
-                     k < 3;
-                     k++) {
+                for (int k = 1; k < 3; k++) {
 
-                    tankOverflowRiskValue = tankOverflowRisk.getMinimum() + i* (
-                            tankOverflowRisk.range() / 5);
+                    tankOverflowRiskValue = tankOverflowRisk.getMinimum() + i * (tankOverflowRisk.range() / 3);
                     try {
-                        Thread.sleep(2000);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    tankOverflowRisk.setInputValue(tankOverflowRiskValue);
+                    tCloseness.setInputValue(tankOverflowRiskValue);
                     engine.process();
                     if(action
                             .highestMembershipTerm
@@ -378,14 +385,15 @@ class MainPanel {
                             ,
                              tankOverflowRiskValue);
                 }
+
             }
+
         }
+
     }
 
-    private static
-    void generateTriangularTerm(InputVariable tankOverflowRisk) {
-        tankOverflowRisk.setRange(0.000,
-                                  1.000);
+    private static void generateTriangularTerm(InputVariable tankOverflowRisk) {
+        tankOverflowRisk.setRange(0.000, 1.000);
         tankOverflowRisk.addTerm(LOW);
         tankOverflowRisk.addTerm(NORMAL);
         tankOverflowRisk.addTerm(HIGHT);
@@ -396,47 +404,32 @@ class MainPanel {
             String term,
             double dangerLevel) {
 
+    private static void notifier(String term, double dangerLevel) {
+
+
         if (dangerLevel > 0.5d) {
             ImageIcon icon = new ImageIcon(MainPanel.class.getResource("/alarm.png"));
-            showErrorNotif(term,
-                           new Color(249,
-                                     78,
-                                     30),
-                           icon);
+            showErrorNotif(term, new Color(249, 78, 30), icon);
         }
         if (dangerLevel > 0.0d && dangerLevel <= 0.3d) {
             ImageIcon icon = new ImageIcon(MainPanel.class.getResource("/info.png"));
-            showErrorNotif(term,
-                           new Color(127,
-                                     176,
-                                     72),
-                           icon);
+            showErrorNotif(term, new Color(127, 176, 72), icon);
         }
         if (dangerLevel > 0.3d && dangerLevel <= 0.5d) {
             ImageIcon icon = new ImageIcon(MainPanel.class.getResource("/warning.png"));
-            showErrorNotif(term,
-                           new Color(249,
-                                     236,
-                                     100),
-                           icon);
+            showErrorNotif(term, new Color(249, 236, 100), icon);
         }
     }
 
-    private static
-    void showErrorNotif(
-            String term,
-            Color color,
-            ImageIcon icon) {
+    private static void showErrorNotif(String term, Color color, ImageIcon icon) {
         NotificationPopup nf = new NotificationPopup(term);
         nf.setIcon(icon);
-        nf.setWIDTH(650);
+        nf.setWIDTH(850);
         nf.setHEIGHT(100);
-        nf.setLocation(10,
-                       10);
-        nf.setFont(new Font("Tachoma",
-                            Font.LAYOUT_LEFT_TO_RIGHT,
-                            11));
+        nf.setLocation(10, 10);
+        nf.setFont(new Font("Tachoma", Font.LAYOUT_LEFT_TO_RIGHT, 14));
         nf.setAlwaysOnTop(true);
+        nf.setHEIGHT(250);
 
         nf.setTitle("Ошибка");
         nf.setDisplayTime(2000);
@@ -447,10 +440,8 @@ class MainPanel {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
-            Logger.getLogger(PopupTester.class.getName())
-                  .log(Level.SEVERE,
-                       null,
-                       ex);
+            Logger.getLogger(PopupTester.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
 }
